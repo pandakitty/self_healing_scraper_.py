@@ -1,7 +1,6 @@
 import streamlit as st
 import pandas as pd
 import matplotlib.pyplot as plt
-import geopandas as gpd
 
 # White Cube Minimalist Configuration
 st.set_page_config(page_title="Geospatial Sentinel", layout="wide")
@@ -30,14 +29,12 @@ with col1:
     }
     df = pd.DataFrame(data)
     
-    # Load low-res map and filter for California area
-    world = gpd.read_file(gpd.datasets.get_path('naturalearth_lowres'))
-    usa = world[world.name == "United States of America"]
-    
     fig, ax = plt.subplots(figsize=(10, 10))
     
-    # Plot Map Outline (Light Grey)
-    usa.plot(ax=ax, color='#f2f2f2', edgecolor='#cccccc')
+    # Surgical drawing of CA boundary (Simplified)
+    ca_outline_lon = [-124.4, -120, -120, -114.1, -114.1, -117.1, -117.2, -124.4, -124.4]
+    ca_outline_lat = [42, 42, 39, 35, 32.5, 32.5, 32.5, 40, 42]
+    ax.plot(ca_outline_lon, ca_outline_lat, color='#cccccc', linewidth=2, linestyle='--', label='CA Jurisdictional Boundary')
     
     # Scatter nodes with legend
     scatter = ax.scatter(df['Lon'], df['Lat'], s=df['Income_Index']*25, c=df['Income_Index'], 
@@ -48,9 +45,10 @@ with col1:
     cbar.set_label('Wealth Index (Normalized)', fontsize=10, weight='bold')
     
     # Zoom to California
-    ax.set_xlim([-125, -114])
-    ax.set_ylim([32, 42])
+    ax.set_xlim([-126, -113])
+    ax.set_ylim([31, 43])
     ax.set_facecolor('white')
+    ax.grid(True, linestyle=':', alpha=0.4)
     
     for i, txt in enumerate(df['Region']):
         ax.annotate(txt, (df['Lon'][i]+0.2, df['Lat'][i]), fontsize=8, weight='bold', zorder=4)
