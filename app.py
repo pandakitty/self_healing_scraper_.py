@@ -1,6 +1,7 @@
 import streamlit as st
 import pandas as pd
 import matplotlib.pyplot as plt
+import geopandas as gpd
 
 # White Cube Minimalist Configuration
 st.set_page_config(page_title="Geospatial Sentinel", layout="wide")
@@ -29,12 +30,32 @@ with col1:
     }
     df = pd.DataFrame(data)
     
-    fig, ax = plt.subplots(figsize=(10, 8))
-    ax.scatter(df['Lon'], df['Lat'], s=df['Income_Index']*20, c=df['Income_Index'], 
-               cmap='YlOrRd', edgecolor='black', linewidth=1.5)
+    # Load low-res map and filter for California area
+    world = gpd.read_file(gpd.datasets.get_path('naturalearth_lowres'))
+    usa = world[world.name == "United States of America"]
+    
+    fig, ax = plt.subplots(figsize=(10, 10))
+    
+    # Plot Map Outline (Light Grey)
+    usa.plot(ax=ax, color='#f2f2f2', edgecolor='#cccccc')
+    
+    # Scatter nodes with legend
+    scatter = ax.scatter(df['Lon'], df['Lat'], s=df['Income_Index']*25, c=df['Income_Index'], 
+                        cmap='YlOrRd', edgecolor='black', linewidth=1.2, alpha=0.9, zorder=3)
+    
+    # Add Colorbar Legend
+    cbar = plt.colorbar(scatter, ax=ax, fraction=0.03, pad=0.04)
+    cbar.set_label('Wealth Index (Normalized)', fontsize=10, weight='bold')
+    
+    # Zoom to California
+    ax.set_xlim([-125, -114])
+    ax.set_ylim([32, 42])
     ax.set_facecolor('white')
+    
     for i, txt in enumerate(df['Region']):
-        ax.annotate(txt, (df['Lon'][i]+0.1, df['Lat'][i]), fontsize=9, weight='bold')
+        ax.annotate(txt, (df['Lon'][i]+0.2, df['Lat'][i]), fontsize=8, weight='bold', zorder=4)
+    
+    plt.title("Regional Wealth Distribution Grid", fontsize=14, pad=15)
     st.pyplot(fig)
 
 with col2:
