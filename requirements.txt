@@ -1,1 +1,6 @@
 streamlit>=1.25.0
+pandas
+matplotlib
+geopandas
+requests
+beautifulsoup4
