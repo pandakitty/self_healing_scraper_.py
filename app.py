@@ -1,7 +1,6 @@
 import streamlit as st
 import pandas as pd
 import matplotlib.pyplot as plt
-from visualize import render_geographic_nodes
 
 # White Cube Minimalist Configuration
 st.set_page_config(page_title="Geospatial Sentinel", layout="wide")
@@ -12,7 +11,7 @@ st.markdown("""
     h1, h2, h3 { font-family: 'JetBrains Mono', monospace; font-weight: 700; color: #1a1a1a; }
     div.stButton > button { border-radius: 0px; border: 2px solid #1a1a1a; }
     </style>
-    """, unsafe_content_type=True)
+    """, unsafe_allow_html=True)
 
 st.title("Geospatial Sentinel Dashboard")
 st.subheader("California NPA Wealth Distribution & Integrity Monitor")
@@ -21,7 +20,6 @@ col1, col2 = st.columns([2, 1])
 
 with col1:
     st.markdown("### 1. Geographic Wealth Nodes")
-    # Using your existing visualization logic
     data = {
         'NPA': ['213/310/323', '415/628', '650', '408/669', '949/714', '619/858', '916'],
         'Region': ['Los Angeles', 'San Francisco', 'Silicon Valley South', 'San Jose', 'Orange County', 'San Diego', 'Sacramento'],
@@ -32,9 +30,11 @@ with col1:
     df = pd.DataFrame(data)
     
     fig, ax = plt.subplots(figsize=(10, 8))
-    scatter = ax.scatter(df['Lon'], df['Lat'], s=df['Income_Index']*20, c=df['Income_Index'], 
-                        cmap='YlOrRd', edgecolor='black', linewidth=1.5)
+    ax.scatter(df['Lon'], df['Lat'], s=df['Income_Index']*20, c=df['Income_Index'], 
+               cmap='YlOrRd', edgecolor='black', linewidth=1.5)
     ax.set_facecolor('white')
+    for i, txt in enumerate(df['Region']):
+        ax.annotate(txt, (df['Lon'][i]+0.1, df['Lat'][i]), fontsize=9, weight='bold')
     st.pyplot(fig)
 
 with col2:
